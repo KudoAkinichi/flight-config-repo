@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        # Flight Service Routes
+        - id: flight-search
+          uri: lb://flight-service
+          predicates:
+            - Path=/api/v1/flights/search
+            - Method=POST
+        - id: flight-details
+          uri: lb://flight-service
+          predicates:
+            - Path=/api/v1/flights/**
+            - Method=GET
+        - id: admin-inventory
+          uri: lb://flight-service
+          predicates:
+            - Path=/api/v1/admin/**
+        
+        # Booking Service Routes
+        - id: create-booking
+          uri: lb://booking-service
+          predicates:
+            - Path=/api/v1/bookings
+            - Method=POST
+        - id: get-booking
+          uri: lb://booking-service
+          predicates:
+            - Path=/api/v1/bookings/**
+            - Method=GET,DELETE
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
